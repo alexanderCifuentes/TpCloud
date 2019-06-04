@@ -1,11 +1,9 @@
+/* eslint-disable linebreak-style */
 /* eslint-env node, mocha */
-
-const assert = require('chai').assert;
-const libunqfy = require('./unqfy');
-
-
+const assert = require('chai').assert; 
+const libunqfy = require('./unqfy'); 
 function createAndAddArtist(unqfy, artistName, country) {
-  const artist = unqfy.addArtist({ name: artistName, country });
+  const artist = unqfy.addArtist({ name: artistName, country });    
   return artist;
 }
 
