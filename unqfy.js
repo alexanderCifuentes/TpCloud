@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable indent */
 
 const picklify = require('picklify'); // para cargar/guarfar unqfy
