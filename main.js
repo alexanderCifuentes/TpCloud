@@ -87,6 +87,7 @@ function executeFunctionByName(fnName, array){
   funciones['removeUser']= removeUser;
   funciones['songsListened']=songsListened;
   funciones['playlistAddTrack']=playlistAddTrack;
+  funciones['populateAlbumsForArtist'] = populateAlbumsForArtist;
 
   if(funciones[fnName] === undefined){
     throw Error(`Error: comando ${fnName} no encontrado`);
@@ -412,6 +413,32 @@ function getArtistsMachingWithName(args){
   const unqfy = getUNQfy();
   console.log(unqfy.getArtistasMachingWithName(args[0]));
 }
+
+
+function populateAlbumsForArtist( args){
+  const unqfy = getUNQfy();
+  unqfy.populateAlbumsForArtist(args[0]);
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //Retorna los albunes que machean con el string pasado como argumento
 function getAlbumsMachingWithName(args){

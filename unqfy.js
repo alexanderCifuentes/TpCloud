@@ -1,3 +1,5 @@
+/* eslint-disable quote-props */
+
 /* eslint-disable linebreak-style */
 /* eslint-disable indent */
 
@@ -10,6 +12,10 @@ const Playlist = require('./Playlist');
 const User = require('./User');
 const CounterTrack = require('./CounterTrack');
 const Buscador = require('./Buscador');
+const Query = require('./Query');
+
+const rp = require('request-promise');
+
 
 class UNQfy {
 
@@ -23,6 +29,8 @@ class UNQfy {
     this.indexPlaylist = -1;
     this.indexUser = -1;
     this.buscador = new Buscador();
+    
+    
   }
 
 
@@ -42,7 +50,68 @@ class UNQfy {
     this.indexAlbum++;
     return this.indexAlbum;
   }
+
+
+//--------------------------- Spotify ----------------------------------------------------------------------
   
+  populateAlbumsForArtist(artistName){
+    const query = new Query();
+    return query.queryAlbumsArtist(artistName);
+    //const artista = this.getArtistaPorNombre(artistName);
+   // const x = this.queryAlbumsArtist(artistName);
+    // x.then((response) => console.log(response.items));
+   // x.then(console.log(x));
+   
+
+  
+   
+  }
+
+  agregarAlbumsAlArtista(artista, albunes){
+    const artistaId = artista.id;
+    albunes.forEach((album) => this.agregarAlbumArtista(album, artistaId));
+  }
+
+  agregarAlbumArtista(album, artistaId){
+    this.addAlbum(artistaId,{name: album.name, year: album.release_date});
+  }
+
+  getArtistaPorNombre(artistName){
+    const art = this.buscador.elementoPorNombre(artistName, this.artistas);
+    this.checkElemento(art,`No se encontro el artista con nombre ${artistName}`);
+    return art;
+  }
+
+
+
+
+
+
+  queryAlbumsArtist(artistName){
+    const query = new Query();
+    return  query.queryAlbumsArtist(artistName);
+  }
+  
+
+
+
+
+  updateArtista(artistData, artista){
+    artista.update(artistData.name, artistData.country);
+    return this.getArtistById(artista.id);
+
+  }
+
+//----------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
   //Check
   //retorna un Id para los Tracks
   getIndexTrack(){
@@ -93,6 +162,7 @@ class UNQfy {
   // retorna: el nuevo artista creado
   //Check
   addArtist(artistData) {
+    this.controlArtistData(artistData);
     this.buscador.checkname(this.artistas, artistData.name, 'artistas');
     const artista = new Artista(artistData.name, artistData.country,this.getIndexArtista());
     this.artistas.push(artista);
@@ -102,6 +172,13 @@ class UNQfy {
     - una propiedad name (string)
     - una propiedad country (string)
   */
+  }
+
+  controlArtistData(artistData){
+    //const name = artistData.name === undefined || 
+    if(artistData.name === undefined || artistData.country === undefined){
+      throw 400;
+    }
   }
 
   //Check
@@ -419,8 +496,9 @@ class UNQfy {
 
   //retorna los artista que machean con el string pasado como parametro
   getArtistasMachingWithName(str){
-   return this.buscador.elementosMachingWithString(str, this.artistas);
-   
+   const lista = this.buscador.elementosMachingWithString(str, this.artistas);
+   //this.checkCantElements(lista, 'No hay elementos que coincidan con la busqueda')
+   return lista;
   }
 
   //retorna los albunes que machean con el string pasado como parametro

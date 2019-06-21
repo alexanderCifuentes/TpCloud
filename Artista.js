@@ -27,6 +27,12 @@ class Artista{
     return this.albunes;
   }
 
+  update(name, country){
+    this.name = name;
+    this.country = country;
+
+  }
+
   //---------------------Artista albunes-----------------------------------------------------------
 
   //Agrega un album a la lista de albunes y le setea el autor del album

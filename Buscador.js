@@ -1,3 +1,4 @@
+/* eslint-disable quote-props */
 /* eslint-disable linebreak-style */
 
 class Buscador{
@@ -6,6 +7,10 @@ class Buscador{
   //Retorna el elemento correspondiente al Id, podria retorna undefined
   elementoById(id, array){
     return array.find((ele) => ele.getId() === id);
+  }
+
+  artistByName(artistName, artistas){
+    return artistas.find((art) => art.name.toLowerCase() === artistName.toLowerCase());
   }
 
   //Retormna el index de un elemento dentro de una listta segun su Id, podria retornar -1
@@ -27,7 +32,7 @@ class Buscador{
   checkname(array, strName, str){
     const nombres = array.map((elem) => elem.getName().toLowerCase());
     if(nombres.includes(strName.toLowerCase())){
-      throw Error('El nombre ' + strName +' ya existe en '+str);
+      throw 409;
     }
   }
 
@@ -40,6 +45,10 @@ class Buscador{
   elementosMachingWithString(str, array){
     return array.filter((ele) => ele.getName().toLowerCase().match(str.toLowerCase()));
   } 
+
+  elementoPorNombre(str, array){
+    return array.filter((ele) => ele.getName().toLowerCase() === str.toLowerCase());
+  }
 
   //Retorna los tracks que contengan al menos uno de los generos pasados como argumento
   tracksMatchingGenres(genres, arrayTracks){

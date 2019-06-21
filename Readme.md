@@ -88,6 +88,7 @@ node main.js getTracksArtistId 2
 node main.js durationPlaylist 1
 
 node main.js playlistAddTrack 4 7
+node main.js populateAlbumsForArtist Juanes
 
 
 
