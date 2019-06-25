@@ -1,10 +1,14 @@
 /* eslint-disable linebreak-style */
+const Spotyfy = require('./Spotyfy');
+const Album = require('./Album');
+
+
 class Artista{
   constructor(unName, unCountry, id){
     this.id = id;
     this.name = unName;
+    this.albums =[];
     this.country = unCountry;
-    this.albunes =[];
   }
 
   //Retorna el name del artista
@@ -24,7 +28,7 @@ class Artista{
 
   //Retorna todos los albunes que posee
   getAlbums(){
-    return this.albunes;
+    return this.albums;
   }
 
   update(name, country){
@@ -38,16 +42,17 @@ class Artista{
   //Agrega un album a la lista de albunes y le setea el autor del album
   addAlbum(album){
     this.checkNameAlbum(album.getName());
-    album.setAutor(this);
-    this.albunes.push(album); 
+    this.albums.push(album); 
     
   }
 
   //Elimina el album correspondiente al ID de su lista de albunes
   removeAlbum(id){
-    const index = this.albunes.findIndex((album) => album.id === id);
+    
+    const index = this.albums.findIndex((album) => album.id === id);
+    console.log(index);
     if(index > -1){
-      this.albunes.splice(index, 1);
+      this.albums.splice(index, 1);
     }
   }
 
@@ -58,20 +63,20 @@ class Artista{
 
   //retorna un booleano que indica si contiene el album correspondiente al Id
   containAlbumId(id){
-    const album = this.getAlbumById(id);
-    return this.albunes.includes(album);
+    const albumsID = this.albums.map((alb) => alb.id);
+    return albumsID.includes(id);
   }
 
   //retorna el album que contiene el track correspondiente al Id, Podria retornar undefined
   albumWithTrackId(id){
-    return this.albunes.find((alb) => alb.containTrack(id));
+    return this.albums.find((alb) => alb.containTrack(id));
   }
   
   //---------------------------------- Artista Track ----------------------------------------------------
   //retorna un booleano que indica si alguno de sus albunes contiene el track correspondiente al Id
   containTrackId(id){
     const album = this.albumWithTrackId(id); 
-    return this.albunes.includes(album);
+    return this.albums.includes(album);
   }
 
   //Retorna el track correspondiente al ID
@@ -81,7 +86,11 @@ class Artista{
 
   //retorna los tracks que tienen cada uno de sus albunes
   getTracks(){
-    return this.albunes.map((album) => album.tracks).reduce((a,b) => a.concat(b),[]); 
+    if(this.albums.length > 0){
+      return this.albums.map((album) => album.tracks).reduce((a,b) => a.concat(b),[]);
+    }else{
+      return [];
+    } 
   }
 
   // retorna: los tracks que contenga alguno de los generos pasados como parametro 
@@ -91,9 +100,9 @@ class Artista{
 
   //Controla que no haya un album con igual nombre en el artista
   checkNameAlbum(str){
-    const name = this.albunes.find((album)=> album.getName().toLowerCase() === str.toLowerCase());
+    const name = this.albums.find((album)=> album.getName().toLowerCase() === str.toLowerCase());
     if(name !== undefined){
-      throw Error('Nombre de album ya existe');
+      throw ({cod: 409, message:'El nombre ya existe'});
     }
   }
 
@@ -101,7 +110,27 @@ class Artista{
   removeTrackId(id){
     this.albumWithTrackId(id).removeTrackId(id);
   }
+  //--------------------------------- VISADO2 -----------------------------------------
 
+  addAlbumsOfSpotify(){
+    //if(!this.consultaSpotify){
+    const spotify = new Spotyfy();
+    spotify.queryAlbumsArtist(this);
+      //this.consultaSpotify = true;}
+  }
+  
+
+  addAlbumsConsultaSpotify(lista){
+    lista.forEach((element) => this.albums.push(this.newAlbum(element))); 
+  }
+
+  newAlbum(ele){
+    const album = new Album(ele.name, ele.release_date, ele.id);
+    return album;
+  }
+
+
+  
 
 }
 

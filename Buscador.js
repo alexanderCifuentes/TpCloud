@@ -29,10 +29,10 @@ class Buscador{
   }
 
   //Controla que no exista ese nombre en la lista, en caso de existir lanza una exception
-  checkname(array, strName, str){
+  checkname(array, strName){
     const nombres = array.map((elem) => elem.getName().toLowerCase());
     if(nombres.includes(strName.toLowerCase())){
-      throw 409;
+      throw ({cod: 409, message:'Ya existe ese nombre'});
     }
   }
 
@@ -43,11 +43,13 @@ class Buscador{
   }
   //Retorna los elementos de una lita que hacen match con el str
   elementosMachingWithString(str, array){
-    return array.filter((ele) => ele.getName().toLowerCase().match(str.toLowerCase()));
+    let st = str;
+    if(st === undefined){st = ''}
+    return array.filter((ele) => ele.getName().toLowerCase().match(st.toLowerCase()));
   } 
 
   elementoPorNombre(str, array){
-    return array.filter((ele) => ele.getName().toLowerCase() === str.toLowerCase());
+    return array.find((ele) => ele.getName().toLowerCase() === str.toLowerCase());
   }
 
   //Retorna los tracks que contengan al menos uno de los generos pasados como argumento

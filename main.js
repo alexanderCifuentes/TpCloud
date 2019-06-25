@@ -88,6 +88,10 @@ function executeFunctionByName(fnName, array){
   funciones['songsListened']=songsListened;
   funciones['playlistAddTrack']=playlistAddTrack;
   funciones['populateAlbumsForArtist'] = populateAlbumsForArtist;
+  funciones['getLyrics'] = getLyrics;
+  funciones['getAlbumsForArtist'] = getAlbumsForArtist;
+  funciones['getUNQfy'] =getUNQfy;
+  funciones['saveUNQfy'] = saveUNQfy;
 
   if(funciones[fnName] === undefined){
     throw Error(`Error: comando ${fnName} no encontrado`);
@@ -157,7 +161,7 @@ function getArtists(args){
   controlParams('getArtist ', args,  ' 0 parametros',0);
   const unqfy = getUNQfy();
   console.log('Artistas de la app');
-  unqfy.getArtists().forEach((elem) => printArtista(elem));  
+  console.log(unqfy.getArtists());
 }
 
 
@@ -184,23 +188,18 @@ function removeAlbum(args){
 }
 
 //Retorna el album correspondiente a la ID
-function printAlbumId(...args){
+function printAlbumId(args){
   controlParams('printAlbumId',args[0],'un albumId',1);
   const unqfy = getUNQfy();
-  printAlbum(unqfy.getAlbumById(Number(args[0])));
+  console.log(unqfy.getAlbumById(Number(args[0])));
 }
 
-//Imprime un album por consola
-function printAlbum(album){
-  console.log('Album ID ' + album.getId() + ', Nombre: '+ album.getName()+', Año de lanzamiento: '+ album.getYear() +
-    ', Tracks: [' + album.getTracks().map((tracks) => ' ' + tracks.getName()) +']' + ' Autor: '+ album.getAutor().getName());
-}
 
 //Retorna todos los albunes que tiene la app
 function getAlbums(args){
   controlParams('getAlbums',args, '0 parametros',0);
   const unqfy = getUNQfy();
-  unqfy.getAlbunes().forEach((elem) => printAlbum(elem));
+  console.log(unqfy.getAlbunes());
 }
 
 //Retorna un album que contiene el trackId
@@ -235,23 +234,19 @@ function removeTrack(args){
 }
 
 //Retorna el track correspondiente al Id
-function printTrackId(...args){
+function printTrackId(args){
   controlParams('printTrackId',args[0],'trackId',1);
   const unqfy = getUNQfy();
-  printTrack(unqfy.getTrackById(Number(args[0])));
+  console.log(unqfy.getTrackById(Number(args[0])));
 
 }
-//Imprime por consola un track
-function printTrack(track){
-  console.log('Track Id: '+ track.getId()+ ' nombre: '+ track.getName()+ ' generos ['+
-   track.getGenres() +']');
-}
+
 
 //Retorna los tracks de la app
 function getTracks(args){
   controlParams('getTracks',args,'0 parametros',0);
   const unqfy = getUNQfy();
-  unqfy.getTracks().forEach((elem) => printTrack(elem));
+  console.log(unqfy.getTracks());
 }
 
 //-------------------------------------------- Playlist --------------------------------------------------
@@ -415,16 +410,28 @@ function getArtistsMachingWithName(args){
 }
 
 
-function populateAlbumsForArtist( args){
+
+//------------------------------- VISADO2 -------------------------------------------------------
+
+function populateAlbumsForArtist(args){
   const unqfy = getUNQfy();
   unqfy.populateAlbumsForArtist(args[0]);
-  
+  saveUNQfy(unqfy);
 }
 
+function getLyrics(args){
+  const unqfy = getUNQfy();
+  unqfy.getLyrics(Number(args[0]));
+  saveUNQfy(unqfy);
+}
 
+function getAlbumsForArtist(args){
+  const unqfy = getUNQfy();
+  console.log(unqfy.getAlbumsForArtist(args[0]));
+  saveUNQfy(unqfy);
+}
 
-
-
+//----------------------------------------------------------------------------------------------------------
 
 
 
@@ -487,3 +494,4 @@ function main() {
   //return eval(commandName)(commandArgs);
 }
 main();
+

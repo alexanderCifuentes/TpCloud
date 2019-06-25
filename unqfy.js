@@ -3,8 +3,8 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable indent */
 
-const picklify = require('picklify'); // para cargar/guarfar unqfy
-const fs = require('fs'); // para cargar/guarfar unqfy
+const picklify = require('picklify'); 
+const fs = require('fs');
 const Artista = require('./Artista');
 const Album = require('./Album');
 const Track = require('./Track');
@@ -12,9 +12,8 @@ const Playlist = require('./Playlist');
 const User = require('./User');
 const CounterTrack = require('./CounterTrack');
 const Buscador = require('./Buscador');
-const Query = require('./Query');
 
-const rp = require('request-promise');
+
 
 
 class UNQfy {
@@ -52,46 +51,46 @@ class UNQfy {
   }
 
 
-//--------------------------- Spotify ----------------------------------------------------------------------
+//--------------------------- VISADO2 ----------------------------------------------------------------------
   
   populateAlbumsForArtist(artistName){
-    const query = new Query();
-    return query.queryAlbumsArtist(artistName);
-    //const artista = this.getArtistaPorNombre(artistName);
-   // const x = this.queryAlbumsArtist(artistName);
-    // x.then((response) => console.log(response.items));
-   // x.then(console.log(x));
-   
-
-  
+    const artista = this.getArtistaPorNombre(artistName);
+    artista.addAlbumsOfSpotify();
    
   }
 
-  agregarAlbumsAlArtista(artista, albunes){
-    const artistaId = artista.id;
-    albunes.forEach((album) => this.agregarAlbumArtista(album, artistaId));
+  getAlbumsForArtist(artistName){
+    const artista = this.getArtistaPorNombre(artistName);
+    this.checkElemento(artista);
+    return artista.albums;
   }
 
-  agregarAlbumArtista(album, artistaId){
-    this.addAlbum(artistaId,{name: album.name, year: album.release_date});
+  getLyrics(trackId){
+    const track = this.getTracks().find((t) => t.id === trackId);
+    this.checkElemento(track);
+    track.getLyrics();
   }
+
+  //Retorna el artista que coincida con el nombre;
+  getArtistasforName(artistName){
+    const artista = this.artistas.find((art) => art.name.toLowerCase() === artistName.toLowerCase());
+    this.checkElemento(artista,'Ningun artista tiene el track con ID ');
+    return artista;
+  }
+
 
   getArtistaPorNombre(artistName){
     const art = this.buscador.elementoPorNombre(artistName, this.artistas);
-    this.checkElemento(art,`No se encontro el artista con nombre ${artistName}`);
+    this.checkElemento(art);
     return art;
   }
 
 
-
-
-
-
-  queryAlbumsArtist(artistName){
-    const query = new Query();
-    return  query.queryAlbumsArtist(artistName);
+  updateAlbum(id,albumdata){
+    const album = this.getAlbumById(id);
+    this.checkElemento(album);
+    album.update(albumdata.name, albumdata.year);
   }
-  
 
 
 
@@ -103,14 +102,6 @@ class UNQfy {
   }
 
 //----------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
 
   //Check
   //retorna un Id para los Tracks
@@ -134,80 +125,79 @@ class UNQfy {
   }
 
   //Controla que hayan elementos en una lista en caso de no haber levanta una exception
-  checkCantElements(array, str){
+  checkCantElements(array){
     if(array.length <= 0){
-      throw Error(str); 
+      throw ({cod: 407, message:'no se encontro  elementos que coincida con la busqueda'}); 
     }
   }
 
   //Controla que el elemento no sea un undefined
-  checkElemento(obj,str){
-    if (!obj){
-      throw Error( str );
+  checkElemento(obj){
+    if (obj === undefined){
+      throw ({cod: 404, message:'no se encontro ningun elemento que coincida con la busqueda'});
+    }
+  }
+
+  checkArtista(art){
+    if (art === undefined){
+      throw ({cod: 333, message:'no se encontro ningun elemento que coincida con la busqueda'});
     }
   }
 
   //Controla que exista el index
-  checkIndex(index, str,id){
+  checkIndex(index){
     if(index < 0){
-      throw Error('No se encontro '+ str+ ' correspondiente al ID: '+ id);
+      throw ({cod: 402, message:'no se encontro ningun elemento que coincida con la busqueda'});
     }
   }
 
 
   //------------------------------------------ Artista ----------------------------------------------------
-  // artistData: objeto JS con los datos necesarios para crear un artista
-  //   artistData.name (string)
-  //   artistData.country (string)
-  // retorna: el nuevo artista creado
-  //Check
+ 
   addArtist(artistData) {
-    this.controlArtistData(artistData);
     this.buscador.checkname(this.artistas, artistData.name, 'artistas');
     const artista = new Artista(artistData.name, artistData.country,this.getIndexArtista());
     this.artistas.push(artista);
     return artista;
-  /* Crea un artista y lo agrega a unqfy.
-  El objeto artista creado debe soportar (al menos):
-    - una propiedad name (string)
-    - una propiedad country (string)
-  */
+
   }
 
   controlArtistData(artistData){
     //const name = artistData.name === undefined || 
     if(artistData.name === undefined || artistData.country === undefined){
-      throw 400;
+      throw ({cod: 400, message:'Falta un parametro'});
     }
   }
 
   //Check
   //remueve un artista de la lista de artistas
   removeArtist(id){
-    const artista = this.buscador.elementoById(id, this.artistas);
-    if(artista){
-      const tracks = artista.getTracks();
-      tracks.forEach((elem) => this.allPlaylistRemoveTrack(elem.getId()));
-      
-      const index = this.buscador.buscarIndex(artista.getId(),this.artistas);
-      this.artistas.splice(index, 1);
-    }else{
-      throw Error('No se encontro el artista correspondiente al ID + '+ id);
-    }
+    const artista = this.getArtistById(id);
+    const tracks = artista.getTracks();
+
+
+
+
+
+
+
+    if(tracks.length > 0){tracks.forEach((elem) => this.allPlaylistRemoveTrack(elem.getId()))}
+    const index = this.buscador.buscarIndex(artista.getId(),this.artistas);
+    this.artistas.splice(index, 1);
+    
   }
 
   //Check
   //Retorna los artistas de la app
   getArtists(){
-    this.checkCantElements(this.artistas, 'No hay artistas en la app');
     return this.artistas;
   }
 
   //Check
   //retorna un artista correspondiente al Id, podria retornar undefined
   getArtistById(id) {
-    const artista = this.buscador.elementoById(id, this.artistas); 
-    this.checkElemento(artista,'No se encontro el artista con el ID '+ id); 
+    const artista = this.artistas.find((a) => a.id === id);
+    this.checkElemento(artista); 
     return artista; 
   }
 
@@ -236,38 +226,43 @@ class UNQfy {
   }
 
   //------------------------------------------ Albums ----------------------------------------------------
-  // albumData: objeto JS con los datos necesarios para crear un album
-  //   albumData.name (string)
-  //   albumData.year (number)
-  // retorna: el nuevo album creado
-  //Check
+ 
   addAlbum(artistId, albumData) {
-    const artista = this.getArtistById(artistId);
-    this.checkElemento(artista,'artista',artistId);
+    const artista = this.artistas.find((a) => a.id ===  artistId);
+    this.checkArtista(artista);
     const album = new Album(albumData.name, albumData.year,this.getIndexAlbum());
     artista.addAlbum(album);
     return album;
-  /* Crea un album y lo agrega al artista con id artistId.
-    El objeto album creado debe tener (al menos):
-     - una propiedad name (string)
-     - una propiedad year (number)
-  */
+  
   }
+
+  controlDatosAlbum(artistId, name, year){
+    if(artistId === undefined || name === undefined || year === undefined){
+      throw ({cod: 400, msg: 'Faltan parametros'});
+    }
+  }
+
 
   //Check
   //Elimina el album correspondiente a la ID
   removeAlbumId(id){ 
-    const artista = this.getArtistWithAlbumId(id);
-    const album = artista.getAlbumById(id);
+   
+    const artista = this.getArtistWithAlbumId(id); 
+    this.checkElemento(artista,'artista',id);
+    const album = this.getAlbunes().find((a) => a.id === id);
+    this.checkElemento(album,'artista',id);
     const tracks = album.getTracks();
-    tracks.forEach((track) => this.allPlaylistRemoveTrack(track.getId()));
+    if(tracks.length>0){tracks.forEach((track) => this.allPlaylistRemoveTrack(track.getId()));}
+   
     artista.removeAlbum(id);
+    
   }
+
+
   //Check
   //Retorna todos los albunes de la app
   getAlbunes(){
     const albunes = this.getArtists().map((art) => art.getAlbums()).reduce((a,b) => a.concat(b),[]);
-    this.checkCantElements(albunes, 'No hay albunes en la app');
     return albunes;
     
   } 
@@ -275,7 +270,9 @@ class UNQfy {
   //Check
   //Retorna el album correspondiente al ID
   getAlbumById(id){ 
-    return this.getArtistWithAlbumId(id).getAlbumById(id);
+    const album = this.getAlbunes().find((al)=> al.id === id);
+    this.checkElemento(album);
+    return album;
   }
 
   //Retorna el album que contiene el track correspondiente al ID
@@ -286,10 +283,6 @@ class UNQfy {
 
   //--------------------------------------------- Tracks --------------------------------------------------
   
-  // trackData: objeto JS con los datos necesarios para crear un track
-  //   trackData.name (string)
-  //   trackData.duration (number)
-  //   trackData.genres (lista de strings)
   // retorna: el nuevo track creado
   //Check
   addTrack(albumId, trackData) {
@@ -299,12 +292,7 @@ class UNQfy {
     album.addTrack(track);
     return track;
 
-  /* Crea un track y lo agrega al album con id albumId.
-  El objeto track creado debe tener (al menos):
-      - una propiedad name (string),
-      - una propiedad duration (number),
-      - una propiedad genres (lista de strings)
-  */
+  
   }
 
   //Check
@@ -330,6 +318,7 @@ class UNQfy {
     return this.getAlbumWithTrackId(id).getTrackById(id);
   }
 
+  
 
   //-------------------------------------------- Playlist -----------------------------------------------
   //Check
@@ -348,9 +337,7 @@ class UNQfy {
     this.playlists.splice(index, 1);
   }
 
-  // name: nombre de la playlist
-  // genresToInclude: array de generos
-  // maxDuration: duración en segundos
+ 
   // retorna: la nueva playlist creada
   //Check
   createPlaylist(name, genresToInclude, maxDuration) {
@@ -368,12 +355,7 @@ class UNQfy {
     this.playlists.push(myPlaylist);
     return myPlaylist;
     
-  /*** Crea una playlist y la agrega a unqfy. ***
-    El objeto playlist creado debe soportar (al menos):
-      * una propiedad name (string)
-      * un metodo duration() que retorne la duración de la playlist.
-      * un metodo hasTrack(aTrack) que retorna true si aTrack se encuentra en la playlist.
-  */
+
 
   }
 
@@ -497,7 +479,6 @@ class UNQfy {
   //retorna los artista que machean con el string pasado como parametro
   getArtistasMachingWithName(str){
    const lista = this.buscador.elementosMachingWithString(str, this.artistas);
-   //this.checkCantElements(lista, 'No hay elementos que coincidan con la busqueda')
    return lista;
   }
 

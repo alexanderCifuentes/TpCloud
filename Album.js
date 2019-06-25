@@ -1,13 +1,60 @@
 /* eslint-disable linebreak-style */
-const Playlist = require('./Playlist.js');
 
-class Album extends Playlist{
+class Album {
   
   constructor(name, year, id){
-    super(name, id);
+    this.id = id;
+    this.name = name;
     this.year = year;
-    this.autor = undefined;
+    this.tracks = [];
+    
   }
+
+  //--------------------------------------------------
+
+  //Retorna el Id 
+  getId(){
+    return this.id;
+  }
+
+  //Retorna el name
+  getName(){
+    return this.name;
+  }
+
+  //agrega un track a su lista de tracks
+  addTrack(track){
+    this.tracks.push(track);
+    
+  }
+  
+  //Elimina el track correspondiente al ID de su lista de tracks
+  removeTrackId(id){
+    const index = this.getTracks().findIndex((track) => track.id === id);
+    if(index > -1){
+      this.getTracks().splice(index, 1);
+    }
+  }
+
+  //retorna todos sus tracks
+  getTracks(){
+    return this.tracks;
+  }
+
+  //retorna el track correspondiente al Id, podria retornar un undefined
+  getTrackById(id){
+    return this.getTracks().find((track) => track.id === id);
+  }
+  
+  //retorna un booleano que indica si contiene el track correspondiente al Id
+  containTrack(id){
+    const track = this.getTrackById(id);
+    return this.getTracks().includes(track);
+  }
+
+
+
+  //-------------------------------------------------
 
   //Setea el autor del album
   setAutor(autor){
@@ -28,11 +75,17 @@ class Album extends Playlist{
   checkTrackName(str){
     const tracksName = this.getTracks().map((track) => track.getName().toLowerCase()).reduce((a,b)=> a.concat(b),[]);  
     if(tracksName.includes(str.toLowerCase())){
-      throw Error ('El track con nombre '+ str + ' ya existe');
+      throw ({cod: 409, message:'El nombre ya existe'});
       
     }
   }
 
+
+  //------------------------------------------ VISADO2 ------------------------------------------------------
+  update(name, year){
+    this.name = name || this.name;
+    this.year = year || this.year;
+  }
   
 }
 
