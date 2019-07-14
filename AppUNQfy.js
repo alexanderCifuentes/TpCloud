@@ -65,7 +65,7 @@ app.post('/api/albums',Validations.validate(Validations.validationAlbum), routeh
 
 
 //Agrega un track a la Unqfy
-app.post('/api/tracks', Validations.validate(Validations.validationTrack), routehelper(async (req,res) =>{
+app.post('/api/track', Validations.validate(Validations.validationTrack), routehelper(async (req,res) =>{
   const unqfy = getUNQfy();
   const track = unqfy.addTrack(parseInt(req.body.albumId), {name: req.body.name, duration: req.body.duration, genres: req.body.genres})
   saveUNQfy(unqfy);
@@ -90,7 +90,7 @@ app.get('/', (req, res) =>{
 });
 
 
-app.get('/api/tracks/:id/lyrics', routehelper(async (req,res) =>{
+app.get('/api/tracks/:id', routehelper(async (req,res) =>{
   
   const unqfy = getUNQfy();
   unqfy.getLyrics(parseInt(req.params.id));
@@ -203,7 +203,7 @@ app.patch('/api/albums/:id', routehelper(async (req,res) =>{
   const unqfy = getUNQfy();
   unqfy.updateAlbum(parseInt(req.params.id),req.body);
   saveUNQfy(unqfy);
-  const album = unqfy.getAlbumById(req.params.id);
+  const album = unqfy.getAlbumById(parseInt(req.params.id));
   res.status(200).send( {
       'id': album.id,
       'name': album.name,

@@ -12,6 +12,7 @@ const Playlist = require('./Playlist');
 const User = require('./User');
 const CounterTrack = require('./CounterTrack');
 const Buscador = require('./Buscador');
+const rp = require('request-promise');
 
 
 
@@ -232,8 +233,25 @@ class UNQfy {
     this.checkArtista(artista);
     const album = new Album(albumData.name, albumData.year,this.getIndexAlbum());
     artista.addAlbum(album);
+    this.notifyApi(artistId,artista.name, albumData.name);
     return album;
   
+  }
+
+//-------------------------------- VISADO3 --------------------------------------------------------------------
+  notifyApi(id, artistName, albumName){
+    const opt = {
+      method: 'POST',
+      uri: 'http://localhost:7000/endpoint/api/notify',
+      body: {
+        artistId: id,
+        subject: `Nuevo Album para artsta ${artistName}`,
+        message: `Se ha agregado el album ${albumName} al artista ${artistName}`,
+        from : 'UNQfy <UNQfy.notifications@gmail.com>'
+        },
+      json: true };
+    rp(opt).then(console.log('ok'))
+          .catch((error) => console.log(error));
   }
 
   controlDatosAlbum(artistId, name, year){

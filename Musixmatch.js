@@ -12,7 +12,8 @@ class Musixmatch{
       qs: {
         apikey: '3890c790db91d08cff064fbebf1defc5',
         q_track_artist : track.name,},
-      json: true 
+      json: true,
+       
     };
     rp.get(options).then((response) =>{const header = response.message.header;
       const body = response.message.body;

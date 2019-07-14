@@ -9,6 +9,7 @@ class Artista{
     this.name = unName;
     this.albums =[];
     this.country = unCountry;
+    
   }
 
   //Retorna el name del artista

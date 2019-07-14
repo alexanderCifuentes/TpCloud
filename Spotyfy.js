@@ -9,7 +9,7 @@ const rp = require('request-promise');
 class Spotyfy{
 
   constructor(){
-    this.token = 'BQDDJtowyD6qyx8LxFYjqp4Lc67iVWBNngAG1JIvI5rGzSoYU2Kn1Tl7Q_uhdDyKN9ujCILnNo-ad4ayXdWbY3nlwg3Xkezf2z-aSRb_AyZdYc_qKno91J-s9XGoUPUkKqZwrruksQKuWGCbMo54BqDRFzd0sqSwVwh9b3NsQnaGPcWH_Pm_';
+    this.token = 'BQAFRgZgjem1rYfLsXH45hSQs9CBXazxGw2v2GCLVrjgm4XYYoU2stJEIAkNDwHX-tWbERIjGxQni-KYKvLS7uXczWkRYNKd3tPjXbSdd66S4kYSGx0-khy8ihV28cqcRf5Ncq8ECkfk17csg77VBWCilhH2G0B4BOxMlcKHHTpsxxiss7wb';
     
   }
   queryAlbumsArtist(artist){

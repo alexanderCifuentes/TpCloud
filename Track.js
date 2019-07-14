@@ -46,7 +46,7 @@ class Track{
   getLyrics(){
     
     //if(!this.lyric){
-    const musi = new Musixmatch();  
+    const musi =   new Musixmatch();  
     musi.getLyrics(this);
     //}
     //return console.log(this.lrcs);
